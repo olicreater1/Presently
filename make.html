@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Presently Slide Maker</title>
+    <style>
+        /* Import stylesheet later */
+        body { font-family: Arial, sans-serif; background: #f4f4f4; margin: 0; padding: 0; }
+        .container { max-width: 900px; margin: 30px auto; background: #fff; padding: 24px; border-radius: 8px; box-shadow: 0 2px 8px #0001; }
+        .slides-nav { margin-bottom: 16px; }
+        .slides-nav button { margin-right: 8px; }
+        .slide-form { display: flex; gap: 32px; }
+        .inputs { flex: 1; }
+        .preview { flex: 1; background: #e9ecef; border-radius: 8px; padding: 24px; min-height: 350px; }
+        .slide-preview { background: #fff; border-radius: 8px; box-shadow: 0 1px 4px #0002; padding: 32px; min-height: 300px; }
+        .slide-preview h2 { margin-top: 0; color: #2a3d6c; }
+        .slide-preview p { font-size: 1.1em; color: #333; }
+        .slide-preview img { max-width: 100%; max-height: 180px; display: block; margin: 16px 0; border-radius: 4px; }
+        .slide-preview a { color: #1a73e8; text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Presently Slide Maker</h1>
+        <div class="slides-nav">
+            <button onclick="addSlide()">Add Slide</button>
+            <button onclick="removeSlide()">Remove Slide</button>
+            <span>Slide <span id="slideNum">1</span> of <span id="slideCount">1</span></span>
+            <button onclick="prevSlide()">&lt; Prev</button>
+            <button onclick="nextSlide()">Next &gt;</button>
+        </div>
+        <form id="slideForm" class="slide-form" oninput="updatePreview()" onsubmit="saveSlides(event)">
+            <div class="inputs">
+                <label>Header:<br><input type="text" id="headerInput" name="header"></label><br><br>
+                <label>Paragraph:<br><textarea id="paraInput" name="paragraph" rows="4"></textarea></label><br><br>
+                <label>Image URL:<br><input type="text" id="imgInput" name="image"></label><br><br>
+                <label>Link URL:<br><input type="text" id="linkInput" name="link"></label><br><br>
+                <button type="submit">Save All Slides</button>
+            </div>
+            <div class="preview">
+                <div class="slide-preview" id="slidePreview"></div>
+            </div>
+        </form>
+        <div id="saveMsg" style="margin-top:16px;color:green;"></div>
+    </div>
+    <script>
+        // Slide data array
+        let slides = [{header:'', paragraph:'', image:'', link:''}];
+        let current = 0;
+
+        function updateForm() {
+            document.getElementById('headerInput').value = slides[current].header || '';
+            document.getElementById('paraInput').value = slides[current].paragraph || '';
+            document.getElementById('imgInput').value = slides[current].image || '';
+            document.getElementById('linkInput').value = slides[current].link || '';
+            document.getElementById('slideNum').textContent = current+1;
+            document.getElementById('slideCount').textContent = slides.length;
+            updatePreview();
+        }
+
+        function updatePreview() {
+            const h = document.getElementById('headerInput').value;
+            const p = document.getElementById('paraInput').value;
+            const img = document.getElementById('imgInput').value;
+            const link = document.getElementById('linkInput').value;
+            let html = '';
+            if(h) html += `<h2>${h}</h2>`;
+            if(p) html += `<p>${p}</p>`;
+            if(img) html += `<img src="${img}" alt="">`;
+            if(link) html += `<a href="${link}" target="_blank">${link}</a>`;
+            document.getElementById('slidePreview').innerHTML = html;
+        }
+
+        function saveCurrent() {
+            slides[current] = {
+                header: document.getElementById('headerInput').value,
+                paragraph: document.getElementById('paraInput').value,
+                image: document.getElementById('imgInput').value,
+                link: document.getElementById('linkInput').value
+            };
+        }
+
+        function addSlide() {
+            saveCurrent();
+            slides.push({header:'', paragraph:'', image:'', link:''});
+            current = slides.length-1;
+            updateForm();
+        }
+        function removeSlide() {
+            if(slides.length > 1) {
+                slides.splice(current,1);
+                if(current >= slides.length) current = slides.length-1;
+                updateForm();
+            }
+        }
+        function prevSlide() {
+            saveCurrent();
+            if(current > 0) current--;
+            updateForm();
+        }
+        function nextSlide() {
+            saveCurrent();
+            if(current < slides.length-1) current++;
+            updateForm();
+        }
+
+        function saveSlides(e) {
+            e.preventDefault();
+            saveCurrent();
+            fetch('save_slides.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({slides: slides})
+            })
+            .then(r => r.text())
+            .then(msg => {
+                document.getElementById('saveMsg').textContent = msg;
+            })
+            .catch(() => {
+                document.getElementById('saveMsg').textContent = 'Save failed.';
+            });
+        }
+
+        // Initialize
+        updateForm();
+    </script>
+</body>
+</html>
