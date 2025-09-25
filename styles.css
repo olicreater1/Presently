@@ -1,0 +1,224 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200;1,200&family=Quicksand:wght@500&display=swap');
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Nunito', sans;
+  background: #6a6b6c;
+  color: #222;
+}
+
+h1, h2, h3, .centered h1 {
+  font-family: 'Quicksand';
+  font-weight: 500;
+}
+
+.para-div p,
+p {
+  font-family: 'Nunito';
+  font-weight: 200;
+}
+
+.container {
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+  background: #f6f8fb;
+}
+
+.left-div {
+  position: sticky;
+  top: 0;
+  flex: 0 0 20%;
+  padding: 24px 0 24px 0;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #6ea8fe 70%, #457b9d 100%);
+  box-shadow: 2px 0 12px rgba(0,0,0,0.06);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  border-top-right-radius: 24px;
+  border-bottom-right-radius: 24px;
+}
+
+.centered {
+  width: 90%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start; 
+  color: #fff;
+  height: 100%;
+  padding-top: 0;
+}
+
+.centered h1 {
+  margin-bottom: 32px;
+  letter-spacing: 2px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 2px 8px rgba(70,123,157,0.10);
+}
+
+.centered a {
+  display: block;
+  text-align: center;
+  width:100%;
+  margin: 12px 0;
+  padding: 10px 0;
+  color: #fff;
+  background: rgba(255,255,255,0.10);
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+  box-shadow: 0 1px 4px rgba(70,123,157,0.05);
+}
+
+.centered a:hover, .centered a:focus {
+  background: #fff;
+  color: #457b9d;
+  box-shadow: 0 2px 12px rgba(70,123,157,0.12);
+  text-decoration: none;
+}
+
+.right-div {
+  flex: 0 0 80%;
+  padding: 40px 5vw;
+  min-height: 100vh;
+  background: #fafdff;
+  border-top-left-radius: 32px;
+  border-bottom-left-radius: 32px;
+  box-shadow: -2px 0 12px rgba(0,0,0,0.06);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.para-div {
+  width: 70vw;
+  overflow-wrap: normal;
+  margin: 0 auto 32px auto;
+  text-align: center;
+  align-content: center;
+  background: #f1f5fa;
+  border-radius: 18px;
+  box-shadow: 0 2px 16px rgba(70,123,157,0.07);
+}
+
+.para-div h1, .para-div h2 {
+  color: #457b9d;
+  margin-bottom: 18px;
+  text-shadow: 0 2px 8px rgba(70,123,157,0.09);
+}
+
+.para-div p {
+  color: #222;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.container-image {
+  max-width: 65vw;
+  height: auto;
+  border-radius: 5px;
+  margin: auto;
+}
+
+.img-responsive {
+  display: block;
+  max-width: 30vw;
+  max-height: 40vh;
+  width: auto;
+  height: auto;
+  margin: 0 auto 18px auto;
+  border-radius: 10px;
+  object-fit: contain;
+  background: #e9eef6;
+}
+
+a {
+  color: #1994e0;
+  transition: color 0.2s;
+}
+
+@media (max-width: 900px) {
+  .container {
+    flex-direction: column;
+  }
+  .left-div, .right-div {
+    flex: unset;
+    width: 100%;
+    min-height: unset;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .right-div {
+    padding: 24px 2vw;
+  }
+}
+.tooltip {
+  position: relative;
+  cursor: help;
+}
+
+.tooltip::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #333;
+  color: #fff;
+  padding: 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+
+.tooltip:hover::after {
+  opacity: 1;
+}
+.login-div {
+  height: 75vh;
+  width: 75vw;
+  border-radius: 25px;
+  background-color: #444;
+  border-color: #000;
+  align-content: center;
+  text-align: center;
+  margin-left: 12.5vw;
+  margin-right: 12.5vw;
+  margin-top: 12.5vh;
+  margin-bottom: 12.5vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-shadow: 0 2px 16px rgba(70,123,157,0.07);
+  align-self: center;
+  color: #f4f4f4
+}
+.login-form-input {
+  width: 40%;
+  height: 40px;
+  margin: 10px auto;
+  border-radius: 8px;
+  border: none;
+  padding: 0 10px;
+  font-size: 16px;
+}
+.login-form-button {
+  width: 20%;
+  height: 40px;
+  margin: 20px auto;
+  border-radius: 8px;
+  border: none;
+  background-color: #1994e0;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
