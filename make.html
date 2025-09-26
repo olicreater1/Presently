@@ -1,129 +1,346 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Presently Slide Maker</title>
-    <style>
-        /* Import stylesheet later */
-        body { font-family: Arial, sans-serif; background: #f4f4f4; margin: 0; padding: 0; }
-        .container { max-width: 900px; margin: 30px auto; background: #fff; padding: 24px; border-radius: 8px; box-shadow: 0 2px 8px #0001; }
-        .slides-nav { margin-bottom: 16px; }
-        .slides-nav button { margin-right: 8px; }
-        .slide-form { display: flex; gap: 32px; }
-        .inputs { flex: 1; }
-        .preview { flex: 1; background: #e9ecef; border-radius: 8px; padding: 24px; min-height: 350px; }
-        .slide-preview { background: #fff; border-radius: 8px; box-shadow: 0 1px 4px #0002; padding: 32px; min-height: 300px; }
-        .slide-preview h2 { margin-top: 0; color: #2a3d6c; }
-        .slide-preview p { font-size: 1.1em; color: #333; }
-        .slide-preview img { max-width: 100%; max-height: 180px; display: block; margin: 16px 0; border-radius: 4px; }
-        .slide-preview a { color: #1a73e8; text-decoration: underline; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Presently - Slide Workshop</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" href="favicon.ico" type="image/x-icon" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200;1,200&family=Quicksand:wght@500&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #f6f8fb;
+      font-family: 'Nunito', sans-serif;
+    }
+    h1, h2, h3, .centered h1 {
+        font-family: 'Quicksand';
+        font-weight: 500;
+    }
+
+    .para-div p, p {
+        font-family: 'Nunito';
+        font-weight: 200;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding: 24px;
+      background: #b4b7b9;
+      border-bottom: 1px solid #ccc;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .toolbar button {
+      padding: 10px 16px;
+      font-family: 'Quicksand';
+      background: #457b9d;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .toolbar button:hover {
+      background: #6ea8fe;
+    }
+
+    .preview-wrapper {
+      width: 100%;
+      height: calc(100vh - 80px);
+      overflow: auto;
+    }
+
+    .right-div {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      padding: 40px 5vw;
+      min-height: 100vh;
+      background: #fafdff;
+      border-top-left-radius: 32px;
+      border-bottom-left-radius: 32px;
+      box-shadow: -2px 0 12px rgba(0,0,0,0.06);
+    }
+
+    .para-div {
+      margin-bottom: 24px;
+      position: relative;
+    }
+
+    .para-div img {
+      max-width: 100%;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .para-div a {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 10px 16px;
+      background: rgba(70,123,157,0.10);
+      color: #457b9d;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .para-div [contenteditable] {
+      outline: none;
+    }
+
+    .delete-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: #e74c3c;
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+      font-size: 14px;
+      line-height: 24px;
+      text-align: center;
+    }
+  </style>
 </head>
 <body>
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <button onclick="addSlide()">Add Slide</button>
+    <button onclick="deleteSlide()">Delete Slide</button>
+    <button onclick="addElement('header')">Add Header</button>
+    <button onclick="addElement('subheader')">Add Subheader</button>
+    <button onclick="addElement('paragraph')">Add Paragraph</button>
+    <button onclick="addElement('image')">Add Image</button>
+    <button onclick="addElement('link')">Add Link</button>
+    <button onclick="exportAllSlidesAsJson()">Save Slides</button>
+    <div id="loading-bar" style="margin-top:auto;margin-bottom:auto;background-color:#68aeda;border-radius:12px;"></div>
+  </div>
+  <!-- Live Preview Area -->
+  <div class="preview-wrapper">
     <div class="container">
-        <h1>Presently Slide Maker</h1>
-        <div class="slides-nav">
-            <button onclick="addSlide()">Add Slide</button>
-            <button onclick="removeSlide()">Remove Slide</button>
-            <span>Slide <span id="slideNum">1</span> of <span id="slideCount">1</span></span>
-            <button onclick="prevSlide()">&lt; Prev</button>
-            <button onclick="nextSlide()">Next &gt;</button>
+      <!-- Sidebar -->
+      <div class="left-div">
+        <div class="centered">
+          <h1>Pages</h1>
+          <div id="slideLinks"></div>
         </div>
-        <form id="slideForm" class="slide-form" oninput="updatePreview()" onsubmit="saveSlides(event)">
-            <div class="inputs">
-                <label>Header:<br><input type="text" id="headerInput" name="header"></label><br><br>
-                <label>Paragraph:<br><textarea id="paraInput" name="paragraph" rows="4"></textarea></label><br><br>
-                <label>Image URL:<br><input type="text" id="imgInput" name="image"></label><br><br>
-                <label>Link URL:<br><input type="text" id="linkInput" name="link"></label><br><br>
-                <button type="submit">Save All Slides</button>
-            </div>
-            <div class="preview">
-                <div class="slide-preview" id="slidePreview"></div>
-            </div>
-        </form>
-        <div id="saveMsg" style="margin-top:16px;color:green;"></div>
+      </div>
+
+      <!-- Editable Slide Content -->
+      <div class="right-div" id="editorArea">
+        <!-- Slide content will be rendered here -->
+      </div>
     </div>
+  </div>
+<!-- End of privew area-->
+
+    <!-- Scripts -->
     <script>
-        // Slide data array
-        let slides = [{header:'', paragraph:'', image:'', link:''}];
-        let current = 0;
+    let slides = [{ title: 'Slide 1', content: [] }];
+    let currentSlide = 0;
+    function renderSlideLinks() {
+      const container = document.getElementById('slideLinks');
+      container.innerHTML = '';
+      slides.forEach((slide, i) => {
+        const link = document.createElement('a');
+        link.textContent = slide.title || `Slide ${i + 1}`;
+        link.href = '#';
+        link.onclick = () => {
+          saveCurrentSlide();
+          currentSlide = i;
+          renderEditor();
+        };
+        container.appendChild(link);
+      });
+    }
+    function addSlide() {
+      saveCurrentSlide();
+      slides.push({ title: `Slide ${slides.length + 1}`, content: [] });
+      currentSlide = slides.length - 1;
+      renderEditor();
+      renderSlideLinks();
+    }
+    function deleteSlide() {
+      if (slides.length > 1) {
+        slides.splice(currentSlide, 1);
+        currentSlide = Math.max(0, currentSlide - 1);
+        renderEditor();
+        renderSlideLinks();
+      }
+    }
+    function addElement(type) {
+        const container = document.createElement('div');
+        container.className = 'para-div';
 
-        function updateForm() {
-            document.getElementById('headerInput').value = slides[current].header || '';
-            document.getElementById('paraInput').value = slides[current].paragraph || '';
-            document.getElementById('imgInput').value = slides[current].image || '';
-            document.getElementById('linkInput').value = slides[current].link || '';
-            document.getElementById('slideNum').textContent = current+1;
-            document.getElementById('slideCount').textContent = slides.length;
-            updatePreview();
-        }
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = '✖';
+        deleteBtn.className = 'delete-btn';
+        deleteBtn.onclick = () => container.remove();
 
-        function updatePreview() {
-            const h = document.getElementById('headerInput').value;
-            const p = document.getElementById('paraInput').value;
-            const img = document.getElementById('imgInput').value;
-            const link = document.getElementById('linkInput').value;
-            let html = '';
-            if(h) html += `<h2>${h}</h2>`;
-            if(p) html += `<p>${p}</p>`;
-            if(img) html += `<img src="${img}" alt="">`;
-            if(link) html += `<a href="${link}" target="_blank">${link}</a>`;
-            document.getElementById('slidePreview').innerHTML = html;
+        let element;
+        switch (type) {
+            case 'header':
+                element = document.createElement('h1');
+                element.textContent = 'Editable Header';
+            break;
+            case 'subheader':
+                element = document.createElement('h2');
+                element.textContent = 'Editable Subheader';
+            break;
+            case 'paragraph':
+                element = document.createElement('p');
+                element.textContent = 'Editable paragraph text.';
+            break;
+            case 'image':
+                element = document.createElement('img');
+                element.src = 'https://via.placeholder.com/400x200';
+                element.style.maxWidth = '100%';
+            break;
+            case 'link':
+                element = document.createElement('a');
+                element.href = '#';
+                element.textContent = 'Editable Link';
+            break;
         }
+        element.contentEditable = true;
+        container.appendChild(deleteBtn);
+        container.appendChild(element);
+        document.getElementById('editorArea').appendChild(container);
+    }
+    function saveCurrentSlide() {
+      const editor = document.getElementById('editorArea');
+      const children = Array.from(editor.children);
+      const title = children[0]?.textContent || `Slide ${currentSlide + 1}`;
+      const content = children.slice(1).map(el => el.outerHTML);
+      slides[currentSlide] = { title, content };
+    }
+    function renderEditor() {
+        const editor = document.getElementById('editorArea');
+        editor.innerHTML = '';
 
-        function saveCurrent() {
-            slides[current] = {
-                header: document.getElementById('headerInput').value,
-                paragraph: document.getElementById('paraInput').value,
-                image: document.getElementById('imgInput').value,
-                link: document.getElementById('linkInput').value
-            };
-        }
+        // Editable title
+        const titleDiv = document.createElement('div');
+        titleDiv.className = 'para-div';
+        const titleInput = document.createElement('h1');
+        titleInput.textContent = slides[currentSlide].title || `Slide ${currentSlide + 1}`;
+        titleInput.contentEditable = true;
+        titleInput.oninput = () => {
+        slides[currentSlide].title = titleInput.textContent;
+        renderSlideLinks();
+    };
+    titleDiv.appendChild(titleInput);
+    editor.appendChild(titleDiv);
 
-        function addSlide() {
-            saveCurrent();
-            slides.push({header:'', paragraph:'', image:'', link:''});
-            current = slides.length-1;
-            updateForm();
-        }
-        function removeSlide() {
-            if(slides.length > 1) {
-                slides.splice(current,1);
-                if(current >= slides.length) current = slides.length-1;
-                updateForm();
-            }
-        }
-        function prevSlide() {
-            saveCurrent();
-            if(current > 0) current--;
-            updateForm();
-        }
-        function nextSlide() {
-            saveCurrent();
-            if(current < slides.length-1) current++;
-            updateForm();
-        }
+    // Render saved elements with delete buttons
+    slides[currentSlide].content.forEach(html => {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'para-div';
+      wrapper.innerHTML = html;
 
-        function saveSlides(e) {
-            e.preventDefault();
-            saveCurrent();
-            fetch('save_slides.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({slides: slides})
-            })
-            .then(r => r.text())
-            .then(msg => {
-                document.getElementById('saveMsg').textContent = msg;
-            })
-            .catch(() => {
-                document.getElementById('saveMsg').textContent = 'Save failed.';
-            });
-        }
+      const deleteBtn = document.createElement('button');
+      deleteBtn.textContent = '✖';
+      deleteBtn.className = 'delete-btn';
+      deleteBtn.onclick = () => wrapper.remove();
 
-        // Initialize
-        updateForm();
+      wrapper.appendChild(deleteBtn);
+      editor.appendChild(wrapper);
+    });
+    }   
+    function exportAllSlidesAsJson() {
+  saveCurrentSlide(); // Save current edits before exporting
+
+  const slideJsonArray = slides.map((slide, index) => {
+    return {
+      id: index + 1,
+      title: slide.title,
+      filename: `slide_${index + 1}.html`,
+      html: `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>${slide.title}</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200;1,200&family=Quicksand:wght@500&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <div class="left-div">
+      <div class="centered">
+        <h1>Pages</h1>
+        ${slides.map((s, i) => `<a href="slide_${i + 1}.html">${s.title || `Slide ${i + 1}`}</a>`).join('')}
+      </div>
+    </div>
+    <div class="right-div">
+      <div class="para-div"><h1>${slide.title}</h1></div>
+      ${slide.content.join('')}
+    </div>
+  </div>
+</body>
+</html>
+      `.trim()
+    };
+  });
+  const user = 'vi'; // TEST VARIABLE
+  const packet = {
+    user: user, 
+    slides: slideJsonArray
+  };
+
+  fetch('save_slides.php', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(packet)
+  })
+  .then(response => response.text())
+  .then(data => {
+    console.log('Slides saved:', data);
+    load(200);
+  })
+  .catch(error => {
+    console.error('Error saving slides:', error);
+    load(404);
+  });
+}
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    async function load(status) {
+        const element = document.getElementById("loading-bar");
+        const loading_bar = ['⏹','⏹','⏹','⏹','⏹','⏹','⏹','⏹','⏹','⏹'];
+        let pastloadingbar = '';
+        for (let i = 0; i <= 9; i++) { // repeat 10 times
+            let loadingbar = loading_bar[i].concat(pastloadingbar);
+            element.innerHTML = loadingbar;
+            pastloadingbar = loadingbar;
+            await sleep(200);
+        }
+        if (status == 200) {
+            element.innerHTML = 'Saved sucessfully.';
+        } else {
+            element.innerHTML = 'Save failed. Try again later.';
+        }
+        await sleep(1000);
+        element.innerHTML = null;
+    }
+
+    window.onload = () => {
+        renderEditor();
+        renderSlideLinks();
+    };
     </script>
 </body>
 </html>
