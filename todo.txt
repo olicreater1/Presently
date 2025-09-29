@@ -1,4 +1,8 @@
 todo:
     add iframe element adder
     fix insertion of img and links
-    accounts
+    dashboard
+    project folders
+    host limited to 1
+    hosting scripts
+    

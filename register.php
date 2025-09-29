@@ -1,6 +1,6 @@
 <?php
 session_start();
-function authenticate($inputUser, $inputPass, $csvPath = 'users.csv') {
+function register($inputUser, $inputPass, $csvPath = 'users.csv') {
     $handle = fopen($csvPath, 'r');
     if (!$handle) return false;
     $headers = fgetcsv($handle);
@@ -35,20 +35,18 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Login - Presently</title>
+        <title>Login - ProjectMe</title>
         <link rel="stylesheet" href="styles.css">
         <link rel="icon" type="image/png" href="favicon.png">
     </head>
     <body>
         <div class="login-div">
-            <form action="login.php" method="POST" id="login-form">
-                <h2>Login</h2>
-                <?php if (isset($error)) echo "<p style='color:#ff4d4d;'>$error</p>"; ?>
-                <input class="login-form-input" type="text" name="username" placeholder="Username" required><br>
-                <input class="login-form-input" type="password" name="password" placeholder="Password" required><br>
-                <button class="login-form-button" type="submit">Login</button>
-                <p>Don't have an account? <a href="register.html">Register here</a></p>
-                <p>Want to recover your account? Ask me in person: Jon Ort.</p>
+            <form action="register.php" method="post" id="login-form">
+                <h2>Register</h2>
+                <input class="login-form-input" type="text" name="set username" placeholder="Username" required><br>
+                <input class="login-form-input" type="password" name="set password" placeholder="Password" required><br>
+                <button class="login-form-button" type="submit">Register</button>
+                <p>Already have an account? <a href="login.html">Login here</a></p>
             </form>
         </div>
     </body>
