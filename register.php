@@ -1,18 +1,22 @@
 <?php
 session_start();
-function register($inputUser, $inputPass, $csvPath = 'users.csv') {
+function check($inputUser, $csvPath = 'users.csv') {
     $handle = fopen($csvPath, 'r');
     if (!$handle) return false;
     $headers = fgetcsv($handle);
     while (($row = fgetcsv($handle)) !== false) {
         list($username, $password) = $row;
-        if (($username === $inputUser) && ($inputPass === $password)) {
+        if ($username === $inputUser) {
             fclose($handle);
-            return true;
+            return false;
         }
     }
     fclose($handle);
-    return false;
+    return true;
+}
+
+function addpass($addUser, $addPass, $csvPath = 'users.csv') {
+
 }
 
 $error = '';
@@ -21,12 +25,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $username = $_POST['username'] ?? '';
     $password = $_POST['password'] ?? '';
 
-    if (authenticate($username, $password)) {
-        $_SESSION['user'] = $username;
-        header("Location: dashboard.html");
-        exit;
+    if (!check($username)) {
+        if (addpass($username, $password)) {
+            header("Location: login.php");
+            exit;
+        }
     } else {
-        $error = 'Failed to login. Incorrect username or password.';
+        $error = 'Username already in use.';
     }
 }
 ?>
@@ -35,7 +40,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Login - ProjectMe</title>
+        <title>Login - Presently</title>
         <link rel="stylesheet" href="styles.css">
         <link rel="icon" type="image/png" href="favicon.png">
     </head>
@@ -46,7 +51,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 <input class="login-form-input" type="text" name="set username" placeholder="Username" required><br>
                 <input class="login-form-input" type="password" name="set password" placeholder="Password" required><br>
                 <button class="login-form-button" type="submit">Register</button>
-                <p>Already have an account? <a href="login.html">Login here</a></p>
+                <p>Already have an account? <a href="login.php">Login here</a></p>
             </form>
         </div>
     </body>
