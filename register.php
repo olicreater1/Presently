@@ -16,7 +16,12 @@ function check($inputUser, $csvPath = 'users.csv') {
 }
 
 function addpass($addUser, $addPass, $csvPath = 'users.csv') {
-
+    $handle = fopen($csvPath, 'a');
+    if (!$handle) return false;
+    $array = [$addUser,$addPass];
+    fputcsv($handle, $array);
+    fclose($handle);
+    return true;
 }
 
 $error = '';
@@ -25,10 +30,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $username = $_POST['username'] ?? '';
     $password = $_POST['password'] ?? '';
 
-    if (!check($username)) {
+    if (check($username)) {
         if (addpass($username, $password)) {
+            $error = 'Account registered sucessfuly.';
+            sleep(3);
             header("Location: login.php");
             exit;
+        } else {
+            $error = 'There was a problem with registering. Try again later.';
         }
     } else {
         $error = 'Username already in use.';
@@ -48,6 +57,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         <div class="login-div">
             <form action="register.php" method="post" id="login-form">
                 <h2>Register</h2>
+                <?php if (isset($error)) echo "<p style='color:#ff4d4d;'>$error</p>"; ?>
                 <input class="login-form-input" type="text" name="set username" placeholder="Username" required><br>
                 <input class="login-form-input" type="password" name="set password" placeholder="Password" required><br>
                 <button class="login-form-button" type="submit">Register</button>
